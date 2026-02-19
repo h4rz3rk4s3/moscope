@@ -30,15 +30,19 @@ import torch
 from datasets import load_dataset
 from transformers import AutoModel, AutoTokenizer
 
-from moe_bert_interp import (
+from config import (
     BufferConfig,
     TopKSAEConfig,
     TrainingConfig,
-    TopKSAE,
-    ActivationBuffer,
-    SingleLayerBuffer,
-    SAETrainer,
 )
+
+from models.topk_sae import TopKSAE
+from buffers.activation_buffer import (
+    ActivationBuffer,
+    SingleLayerBuffer
+)
+
+from trainers.sae_trainer import SAETrainer
 
 
 # ---------------------------------------------------------------------------

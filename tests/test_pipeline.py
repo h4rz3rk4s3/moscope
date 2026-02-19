@@ -15,16 +15,16 @@ import torch.nn as nn
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from moe_bert_interp.config import (
+from config import (
     TopKSAEConfig, CLTConfig, BufferConfig, TrainingConfig
 )
-from moe_bert_interp.models.topk_sae import TopKSAE
-from moe_bert_interp.models.cross_layer_transcoder import (
+from models.topk_sae import TopKSAE
+from models.cross_layer_transcoder import (
     CrossLayerTranscoder, JumpReLUFunction
 )
 
 
-DEVICE = "cpu"
+DEVICE = "mps"
 DTYPE  = torch.float32
 
 

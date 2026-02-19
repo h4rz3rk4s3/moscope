@@ -1,5 +1,5 @@
 """
-Centralized configuration dataclasses for the MoE-BERT interpretability pipeline.
+Centralized configuration dataclasses of MoScope.
 All hyperparameters live here so experiments are fully reproducible.
 """
 
@@ -95,7 +95,7 @@ class TopKSAEConfig:
 
     # Number of latent features (dictionary size).
     # Common choices: 4×, 8×, 16×, 32× d_model.
-    n_features: int = 16_384  # 768 * ~21
+    n_features: int = 4 * d_model  # 768 * ~21
 
     # Top-K sparsity: how many features are active per token.
     k: int = 64
@@ -132,7 +132,8 @@ class CLTConfig:
     d_model: int = 768
 
     # Number of CLT features per layer.
-    n_features: int = 16_384
+    # Common choices: 4×, 8×, 16×, 32× d_model.
+    n_features: int = 4 * d_model
 
     # JumpReLU threshold initial value (log-space stored for numerical stability).
     jumprelu_init_threshold: float = 0.03
@@ -190,7 +191,7 @@ class TrainingConfig:
     output_dir: Path = Path("./checkpoints")
 
     # W&B project name (set to None to disable).
-    wandb_project: Optional[str] = "moe-bert-interp"
+    wandb_project: Optional[str] = "moscope"
 
     # Experiment name / run ID.
     run_name: str = "topk_sae_run_1"
