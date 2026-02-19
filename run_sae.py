@@ -27,7 +27,9 @@ import random
 from itertools import islice
 
 import torch
-from datasets import load_dataset
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from datasets import load_dataset, Dataset
 from transformers import AutoModel, AutoTokenizer
 
 from config import (
@@ -68,10 +70,10 @@ def parse_args():
     p.add_argument("--run_name", default="topk_sae")
     p.add_argument("--resume_from", default=None)
     p.add_argument("--seed", type=int, default=42)
-    p.add_argument("--dataset", default="Salesforce/wikitext",
+    p.add_argument("--dataset", default="hatecheck",
                    help="HuggingFace dataset name for training text")
-    p.add_argument("--dataset_split", default="train")
-    p.add_argument("--dataset_text_field", default="text")
+    #p.add_argument("--dataset_split", default="train")
+    #p.add_argument("--dataset_text_field", default="text")
     return p.parse_args()
 
 
@@ -115,8 +117,12 @@ def main():
 
     # ---- Dataset ----
     print(f"[run_sae] Loading dataset {args.dataset}...")
-    ds = load_dataset(args.dataset, "wikitext-103-raw-v1",
-                      split=args.dataset_split, streaming=True)
+    df_data = pd.read_csv(f"data/{args.dataset}")
+    df_train, df_test = train_test_split(df_data, test_size=0.2, stratify="is_toxic")
+    # ds = load_dataset(args.dataset, "wikitext-103-raw-v1",
+    #                   split=args.dataset_split, streaming=True)
+    train_ds = Dataset.from_pandas(df_train)
+    test_ds = Dataset.from_pandas(df_test)
     text_iter = (
         row[args.dataset_text_field]
         for row in ds

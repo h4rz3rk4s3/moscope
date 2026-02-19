@@ -30,14 +30,19 @@ import torch
 from datasets import load_dataset
 from transformers import AutoModel, AutoTokenizer
 
-from moe_bert_interp import (
+from config import (
     BufferConfig,
     CLTConfig,
     CLTTrainingConfig,
-    CrossLayerTranscoder,
-    ActivationBuffer,
-    CLTTrainer,
 )
+
+from models.cross_layer_transcoder import CrossLayerTranscoder
+from buffers.activation_buffer import (
+    ActivationBuffer
+)
+
+from trainers.clt_trainer import CLTTrainer
+
 
 
 # ---------------------------------------------------------------------------
