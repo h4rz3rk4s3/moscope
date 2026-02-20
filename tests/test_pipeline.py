@@ -40,14 +40,15 @@ class TestTopKSAE:
 
     def test_output_shape(self):
         sae = self._make_sae()
-        x = torch.randn(32, 64)
+        x = torch.randn(32, 64).to(DEVICE).to(DTYPE)
+        print(x.device)
         out = sae(x)
         assert out.x_hat.shape == x.shape
         assert out.z_topk.shape == (32, 256)
 
     def test_sparsity_constraint(self):
         sae = self._make_sae(k=16)
-        x = torch.randn(32, 64)
+        x = torch.randn(32, 64).to(DEVICE).to(DTYPE)
         out = sae(x, compute_loss=False)
         active_per_token = (out.z_topk > 0).sum(dim=-1)
         # Every token should have exactly k=16 active features
@@ -56,7 +57,7 @@ class TestTopKSAE:
 
     def test_loss_is_mse(self):
         sae = self._make_sae()
-        x = torch.randn(8, 64)
+        x = torch.randn(8, 64).to(DEVICE).to(DTYPE)
         out = sae(x)
         expected_loss = ((out.x_hat - x) ** 2).mean()
         assert abs(out.loss.item() - expected_loss.item()) < 1e-5
@@ -70,14 +71,14 @@ class TestTopKSAE:
 
     def test_no_nan_in_forward(self):
         sae = self._make_sae()
-        x = torch.randn(64, 64)
+        x = torch.randn(64, 64).to(DEVICE).to(DTYPE)
         out = sae(x)
         assert not torch.isnan(out.loss), "Loss should not be NaN"
         assert not torch.isnan(out.x_hat).any(), "x_hat should not contain NaN"
 
     def test_gradient_flows(self):
         sae = self._make_sae()
-        x = torch.randn(8, 64)
+        x = torch.randn(8, 64).to(DEVICE).to(DTYPE)
         out = sae(x)
         out.loss.backward()
         assert sae.W_enc.grad is not None
@@ -87,7 +88,7 @@ class TestTopKSAE:
         sae = self._make_sae(n=256, k=4)
         sae.train()
         for _ in range(5):
-            x = torch.randn(16, 64)
+            x = torch.randn(16, 64).to(DEVICE).to(DTYPE)
             sae(x)
         frac = sae.dead_fraction(window=100)
         assert 0.0 <= frac <= 1.0
@@ -100,11 +101,11 @@ class TestTopKSAE:
 class TestJumpReLU:
 
     def test_forward_thresholding(self):
-        pre_act = torch.tensor([[0.5, 0.02, 0.1, -0.1]])
-        log_theta = torch.log(torch.tensor([0.1, 0.1, 0.05, 0.05]))
+        pre_act = torch.tensor([[0.5, 0.02, 0.1, -0.1]]).to(DEVICE).to(DTYPE)
+        log_theta = torch.log(torch.tensor([0.1, 0.1, 0.05, 0.05])).to(DEVICE).to(DTYPE)
         out = JumpReLUFunction.apply(pre_act, log_theta, 1.0)
         # 0.5 > 0.1 → 0.5; 0.02 < 0.1 → 0; 0.1 > 0.05 → 0.1; -0.1 < 0.05 → 0
-        expected = torch.tensor([[0.5, 0.0, 0.1, 0.0]])
+        expected = torch.tensor([[0.5, 0.0, 0.1, 0.0]]).to(DEVICE).to(DTYPE)
         assert torch.allclose(out, expected), f"Got {out}, expected {expected}"
 
     def test_gradient_flows(self):
@@ -132,8 +133,8 @@ class TestCLT:
         return CrossLayerTranscoder(cfg).to(DEVICE)
 
     def _make_inputs(self, L=4, B=8, D=64):
-        residuals = {l: torch.randn(B, D) for l in range(L)}
-        mlp_outs  = {l: torch.randn(B, D) for l in range(L)}
+        residuals = {l: torch.randn(B, D).to(DEVICE).to(DTYPE) for l in range(L)}
+        mlp_outs  = {l: torch.randn(B, D).to(DEVICE).to(DTYPE) for l in range(L)}
         return residuals, mlp_outs
 
     def test_output_shapes(self):
@@ -231,7 +232,7 @@ class TestBufferConfig:
 
     def test_default_device_is_valid(self):
         cfg = BufferConfig()
-        assert cfg.device in ("cuda", "mps", "cpu")
+        assert cfg.device in ("cuda", "mps")
 
 
 if __name__ == "__main__":

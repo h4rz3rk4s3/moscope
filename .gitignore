@@ -1,3 +1,6 @@
+# Folders and Files in MoScope
+config.ini
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

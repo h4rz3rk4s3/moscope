@@ -19,9 +19,9 @@ def _default_device() -> str:
     import torch
     if torch.cuda.is_available():
         return "cuda"
-    if torch.backends.mps.is_available():
-        return "mps"
-    return "cpu"
+    # if torch.backends.mps.is_available():
+    #     return "mps"
+    return "mps"
 
 
 def _default_dtype(device: str) -> str:

@@ -21,8 +21,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import LambdaLR
 
-from ..config import CLTConfig, CLTTrainingConfig
-from ..models.cross_layer_transcoder import CrossLayerTranscoder
+from config import CLTConfig, CLTTrainingConfig
+from models.cross_layer_transcoder import CrossLayerTranscoder
 
 
 # ---------------------------------------------------------------------------

@@ -23,9 +23,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ..models.topk_sae import TopKSAE
-from ..models.cross_layer_transcoder import CrossLayerTranscoder
-from ..hooks.model_hooks import ActivationExtractor
+from models.topk_sae import TopKSAE
+from models.cross_layer_transcoder import CrossLayerTranscoder
+from hooks.model_hooks import ActivationExtractor
 
 
 # ---------------------------------------------------------------------------
@@ -58,7 +58,7 @@ def find_max_activating_examples(
     top_n: int = 20,
     batch_size: int = 16,
     max_seq_len: int = 512,
-    device: str = "cpu",
+    device: str = "mps",
 ) -> MaxActivatingExamples:
     """
     Scan a corpus for the `top_n` token positions that maximally
@@ -138,7 +138,7 @@ def steer_feature(
     feature_idx: int,
     steer_magnitude: float,
     sae: Optional[TopKSAE] = None,
-    device: str = "cpu",
+    device: str = "mps",
 ) -> SteeringResult:
     """
     Add a fixed multiple of feature `feature_idx`'s decoder direction
@@ -302,7 +302,7 @@ def analyse_expert_routing(
     top_k_experts: int = 4,
     batch_size: int = 16,
     max_seq_len: int = 512,
-    device: str = "cpu",
+    device: str = "mps",
 ) -> ExpertRoutingCorrelation:
     """
     Correlate activations of `feature_idx` at `layer_idx` with the expert

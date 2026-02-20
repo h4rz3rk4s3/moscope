@@ -25,8 +25,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import LambdaLR
 
-from ..config import TopKSAEConfig, TrainingConfig
-from ..models.topk_sae import TopKSAE
+from config import TopKSAEConfig, TrainingConfig
+from models.topk_sae import TopKSAE
 
 
 # ---------------------------------------------------------------------------

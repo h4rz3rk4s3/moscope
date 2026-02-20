@@ -76,7 +76,7 @@ class ActivationExtractor:
     # ------------------------------------------------------------------
     # Model introspection helpers
     # ------------------------------------------------------------------
-
+    #TODO: Need to fix find_layers, as it doesn't catch layers, but breaks in the for-loop
     @staticmethod
     def _find_layers(model: nn.Module) -> nn.ModuleList:
         """
@@ -93,7 +93,9 @@ class ActivationExtractor:
             obj = model
             try:
                 for attr in path.split("."):
+                    print
                     obj = getattr(obj, attr)
+                    print(obj)
                 if isinstance(obj, (nn.ModuleList, nn.Sequential)):
                     return obj
             except AttributeError:
@@ -109,7 +111,7 @@ class ActivationExtractor:
         Return the MLP sub-module inside a transformer layer.
         Tries common attribute names.
         """
-        for name in ("mlp", "feed_forward", "ffn", "moe", "moe_block"):
+        for name in ("mlp"): #("mlp", "feed_forward", "ffn", "moe", "moe_block")
             if hasattr(layer_module, name):
                 return getattr(layer_module, name)
         return None

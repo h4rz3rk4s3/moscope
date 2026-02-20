@@ -49,8 +49,9 @@ from typing import Dict, List, NamedTuple, Optional, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from math import log
 
-from ..config import CLTConfig
+from config import CLTConfig
 
 
 # ---------------------------------------------------------------------------
@@ -128,7 +129,7 @@ class CLTLayerEncoder(nn.Module):
         self.b_enc = nn.Parameter(torch.zeros(n_features))
         # Store threshold in log-space for numerical stability
         self.log_threshold = nn.Parameter(
-            torch.full((n_features,), init_log_threshold)
+            torch.full((n_features,), log(init_log_threshold))
         )
         self.bandwidth = bandwidth
         self._init_weights(n_features)

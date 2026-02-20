@@ -25,6 +25,7 @@ On H200:
 import argparse
 import random
 from itertools import islice
+import configparser
 
 import torch
 import pandas as pd
@@ -47,21 +48,28 @@ from buffers.activation_buffer import (
 from trainers.sae_trainer import SAETrainer
 
 
+config = configparser.ConfigParser()
+try:
+    config.read('config.ini')
+except:
+    pass 
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
 def parse_args():
     p = argparse.ArgumentParser("Top-K SAE training")
-    p.add_argument("--model_name", default="answerdotai/ModernBERT-base")
+    p.add_argument("--model_name", default="ModernBERT-base")
     p.add_argument("--layer", type=int, default=6)
     p.add_argument("--hook_point", default="residual",
                    choices=["residual", "mlp_out"])
     p.add_argument("--n_features", type=int, default=16_384)
-    p.add_argument("--k", type=int, default=64)
-    p.add_argument("--n_steps", type=int, default=100_000)
-    p.add_argument("--batch_size", type=int, default=4096)
-    p.add_argument("--buffer_size", type=int, default=500_000)
+    p.add_argument("--k", type=int, default=16)
+    p.add_argument("--n_steps", type=int, default=256)
+    p.add_argument("--batch_size", type=int, default=128)
+    p.add_argument("--buffer_size", type=int, default=1000) #500_000
     p.add_argument("--lr", type=float, default=2e-4)
     p.add_argument("--device", default=None)
     p.add_argument("--dtype", default=None)
@@ -73,7 +81,7 @@ def parse_args():
     p.add_argument("--dataset", default="hatecheck",
                    help="HuggingFace dataset name for training text")
     #p.add_argument("--dataset_split", default="train")
-    #p.add_argument("--dataset_text_field", default="text")
+    p.add_argument("--dataset_text_field", default="statement")
     return p.parse_args()
 
 
@@ -106,8 +114,9 @@ def main():
 
     # ---- Load model + tokenizer ----
     print(f"[run_sae] Loading {args.model_name}...")
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
-    model = AutoModel.from_pretrained(args.model_name, torch_dtype=torch.float32)
+    weights_directory = config[args.model_name]['weights_directory'] if args.model_name in config else args.model_name
+    tokenizer = AutoTokenizer.from_pretrained(weights_directory)
+    model = AutoModel.from_pretrained(weights_directory, torch_dtype=torch.float32)
     model = model.to(device)
     model.eval()
     for p in model.parameters():
@@ -117,14 +126,14 @@ def main():
 
     # ---- Dataset ----
     print(f"[run_sae] Loading dataset {args.dataset}...")
-    df_data = pd.read_csv(f"data/{args.dataset}")
-    df_train, df_test = train_test_split(df_data, test_size=0.2, stratify="is_toxic")
+    df_data = pd.read_csv(f"data/{args.dataset}.csv", sep=",")
+    #df_train, df_test = train_test_split(df_data, test_size=0.2, stratify="is_toxic")
     # ds = load_dataset(args.dataset, "wikitext-103-raw-v1",
     #                   split=args.dataset_split, streaming=True)
-    train_ds = Dataset.from_pandas(df_train)
-    test_ds = Dataset.from_pandas(df_test)
+    train_ds = Dataset.from_pandas(df_data)
+    #test_ds = Dataset.from_pandas(df_test)
     text_iter = (
-        row["statement"]
+        row[args.dataset_text_field]
         for row in train_ds
         if len(row[args.dataset_text_field].strip()) > 50
     )

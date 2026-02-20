@@ -37,7 +37,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ..config import TopKSAEConfig
+from config import TopKSAEConfig
 
 
 # ---------------------------------------------------------------------------
@@ -210,6 +210,9 @@ class TopKSAE(nn.Module):
 
         # Optionally scale to ~unit RMS
         norm_scale = self.running_norm if self.cfg.normalize_activations else torch.ones(1)
+
+        # Make sure that norm_scale is on the same device as x
+        norm_scale = norm_scale.to(x.device)
         x_norm = x / norm_scale.clamp(min=1e-8)
 
         z_topk, z_pre, topk_idx = self.encode(x_norm)

@@ -48,8 +48,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from ..config import BufferConfig
-from ..hooks.model_hooks import ActivationExtractor
+from config import BufferConfig
+from hooks.model_hooks import ActivationExtractor
 
 
 # ---------------------------------------------------------------------------
