@@ -124,8 +124,8 @@ def main():
     train_ds = Dataset.from_pandas(df_train)
     test_ds = Dataset.from_pandas(df_test)
     text_iter = (
-        row[args.dataset_text_field]
-        for row in ds
+        row["statement"]
+        for row in train_ds
         if len(row[args.dataset_text_field].strip()) > 50
     )
 
